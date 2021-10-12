@@ -17,11 +17,12 @@ router.post('/createuser', [body('name', 'Enter a valid name').isLength({ min: 3
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+  let success = false;
   try {
     let user = await User.findOne({ email: req.body.email })
     if (user) {
 
-      return res.status(400).json({ error: "Try again, this email already exist" })
+      return res.status(400).json({success, error: "Try again, this email already exist" })
     }
 
     const salt = await bcrypt.genSalt(10)
@@ -40,7 +41,8 @@ router.post('/createuser', [body('name', 'Enter a valid name').isLength({ min: 3
       }
     }
     const authtoken = jwt.sign(data, JWT_SECRET)
-    res.json({ authtoken: authtoken })
+    success=true
+    res.json({ success,authtoken })
   } //catching errors 
   catch (error) {
     console.error(error.message);
@@ -58,22 +60,24 @@ router.post('/login', [body('email', 'Enter a valid Email').isEmail(), body('pas
     return res.status(400).json({ errors: errors.array() });
   }
   const { email, password } = req.body
+  let success = false;
   try {
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: "sorry user does not exist" })
+      return res.status(400).json({ success,error: "sorry user does not exist" })
     }
     let passwordcompare = await bcrypt.compare(password, user.password);
     if (!passwordcompare) {
-      return res.status(400).json({ error: "try again,bad credentials" })
+      return res.status(400).json({ success,error: "try again,bad credentials" })
     }
     const data = {
       user: {
         id: user.id
       }
     }
+    success= true;
     const authtoken = jwt.sign(data, JWT_SECRET)
-    res.json({ authtoken: authtoken })
+    res.json({ success,authtoken })
 
 
   } catch (error) {

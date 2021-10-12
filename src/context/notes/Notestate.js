@@ -14,7 +14,7 @@ const NoteState = (props) => {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjE2MzAxNzRkYzVmNTA3ZmJjYmZmYjQ3In0sImlhdCI6MTYzMzg3ODM4OH0.zxJkgEwQF408qOP5X0DMsNpkcjvfCQYl_j-o8dYFaXs"
+        'auth-token': localStorage.getItem('token')
       }
     });
    
@@ -30,20 +30,11 @@ const NoteState = (props) => {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjE2MzAxNzRkYzVmNTA3ZmJjYmZmYjQ3In0sImlhdCI6MTYzMzg3ODM4OH0.zxJkgEwQF408qOP5X0DMsNpkcjvfCQYl_j-o8dYFaXs"
+        'auth-token': localStorage.getItem('token')
       },
       body: JSON.stringify({ title, description, tag })
     });
-    const note = [{
-      "_id": "61322f19553781ak8ca80e08",
-      "user": "6131dc5e3e4037cd4734a066",
-      "title": title,
-      "description": description,
-      "tag": tag,
-      "date": "2021-09-03T14:20:09.668Z",
-      "__v": 0
-    },
-    ]
+    const note= await response.json()
     setNotes(notes.concat(note))
   }
   //Delete a Note
@@ -54,7 +45,7 @@ const NoteState = (props) => {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjE2MzAxNzRkYzVmNTA3ZmJjYmZmYjQ3In0sImlhdCI6MTYzMzg3ODM4OH0.zxJkgEwQF408qOP5X0DMsNpkcjvfCQYl_j-o8dYFaXs"
+        'auth-token': localStorage.getItem('token')
       }
     });
     const json = response.json();
@@ -72,21 +63,27 @@ const NoteState = (props) => {
       method: "PUT",
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjE2MzAxNzRkYzVmNTA3ZmJjYmZmYjQ3In0sImlhdCI6MTYzMzg3ODM4OH0.zxJkgEwQF408qOP5X0DMsNpkcjvfCQYl_j-o8dYFaXs"
+        'auth-token': localStorage.getItem('token')
       },
       body: JSON.stringify({ title, description, tag })
     });
-    const json = response.json();
+    const json =await response.json();
+    console.log(json)
+
+    let newnotes=JSON.parse(JSON.stringify(notes))
     //Edit from the client side
-    for (let index = 0; index < notes.length; index++) {
-      const element = notes[index];
+    for (let index = 0; index < newnotes.length; index++) {
+      const element = newnotes[index];
       if (element._id === id) {
-        element.title = title;
-        element.description = description;
-        element.tag = tag;
+        newnotes[index].title = title;
+        newnotes[index].description = description;
+        newnotes[index].tag = tag;
+         break;
       }
+     
 
     }
+    setNotes(newnotes);
   }
 
 
